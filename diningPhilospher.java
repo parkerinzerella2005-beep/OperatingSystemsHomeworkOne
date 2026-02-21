@@ -1,5 +1,4 @@
 import java.util.Scanner;
-import java.math.*;
 import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
 import java.util.concurrent.Semaphore;
