@@ -5,12 +5,12 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.Semaphore;
 
 public class diningPhilospher implements Runnable {
-        static int P;
-        static int M;
-        int id;
-        static Scanner myScanner = new Scanner(System.in);
-     
-
+    static int P;
+    static int M;
+    static Semaphore[] Chopsticks;
+    static Semaphore Meal;
+    int id;
+    static Scanner myScanner = new Scanner(System.in); 
     public static void main(String[] args) {
         try {
             P = getPhilosophers();
@@ -28,15 +28,81 @@ public class diningPhilospher implements Runnable {
         if(M == 0){
             return;
         }        
-       
-    }
+
+        //setting the Chopsticks semaphore array length equal to number of Philosophers
+        Chopsticks = new Semaphore[P];
+        
+        Thread[] diningPhilosphers = new Thread[P];
+        //Initianilize array of Philosphers and start each one
+        for(int i = 0; i<P; i++){
+            diningPhilosphers[i] = new Thread(new diningPhilospher(i));
+            diningPhilosphers[i].start();
+        }
+    }   
 
     public diningPhilospher(int id){
             this.id =id;
         }
-    
-    public void run(){
 
+    // while meals > 0:
+    // pick up right chopstick if available
+    // pick up left chopstick if available
+    
+    // if both chopsticks acquired:
+    //     eat (decrement meals)
+    //     put down both chopsticks
+    // else:
+    //     put down any chopstick you picked up
+    //     yield and try again
+
+    public void run(){
+        try{
+            //since the philosphers can eat more that one meal
+            while(true){
+            Meal.acquire();
+            if(M>0){
+                //left chopstick
+                if(Chopsticks[id].tryAcquire()){
+                    //right chopstick
+                    if(Chopsticks[(id+1) % P].tryAcquire()){
+                        M--;
+                        Meal.release();
+
+                        //eating
+                        int eating = 3 + (int) (Math.random() * 4);
+                        for (int i = 0; i < eating; i++) {
+                            Thread.yield();
+                        }
+                        
+                        Chopsticks[id].release();
+                        Chopsticks[(id+1) % P].release();
+
+                        //thinkiing
+                        int thinking = 3 + (int) (Math.random() * 4);
+                        for (int i = 0; i < thinking; i++) {
+                            Thread.yield();
+                        }
+
+                    }
+                    else{
+                        Chopsticks[id].release();
+                        Meal.release();
+                        Thread.yield();
+                    }
+                }   
+                else{
+                    Meal.release();
+                    Thread.yield();
+                }
+            }
+            else{
+                Meal.release();
+                return;
+            }
+        }
+        } catch (InterruptedException e){
+            Thread.currentThread().interrupt();
+        }
     }
 
     public static int getPhilosophers(){
