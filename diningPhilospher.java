@@ -7,6 +7,7 @@ public class diningPhilospher implements Runnable {
     static int P;
     static int M;
     static Semaphore[] Chopsticks;
+    static Thread[] diningPhilosphers;
     static Semaphore Meal;
     int id;
     static Scanner myScanner = new Scanner(System.in); 
@@ -28,11 +29,17 @@ public class diningPhilospher implements Runnable {
             return;
         }        
 
-        //setting the Chopsticks semaphore array length equal to number of Philosophers
+        //setting the Chopsticks semaphore array length equal to number of Philosophers and intializing semaphores
         Chopsticks = new Semaphore[P];
+        for (int i = 0; i < P; i++) {
+            Chopsticks[i] = new Semaphore(1);
+        }
+
+        //setting Meal
+        Meal = new Semaphore(1);
         
-        Thread[] diningPhilosphers = new Thread[P];
         //Initianilize array of Philosphers and start each one
+        diningPhilosphers = new Thread[P];
         for(int i = 0; i<P; i++){
             diningPhilosphers[i] = new Thread(new diningPhilospher(i));
             diningPhilosphers[i].start();
@@ -76,7 +83,7 @@ public class diningPhilospher implements Runnable {
                         Chopsticks[id].release();
                         Chopsticks[(id+1) % P].release();
 
-                        //thinkiing
+                        //thinking
                         int thinking = 3 + (int) (Math.random() * 4);
                         for (int i = 0; i < thinking; i++) {
                             Thread.yield();
