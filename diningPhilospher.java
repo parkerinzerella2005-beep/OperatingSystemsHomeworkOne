@@ -75,25 +75,11 @@ public class diningPhilospher implements Runnable {
             System.out.println("-Philosopher " + (i+1) + " starting.");
             diningPhilosphers[i].start();
         }
-    
-    
-        
     }   
 
     public diningPhilospher(int id){
             this.id =id;
         }
-
-    // while meals > 0:
-    // pick up right chopstick if available
-    // pick up left chopstick if available
-    
-    // if both chopsticks acquired:
-    //     eat (decrement meals)
-    //     put down both chopsticks
-    // else:
-    //     put down any chopstick you picked up
-    //     yield and try again
 
     public void run(){
         try{
@@ -122,16 +108,20 @@ public class diningPhilospher implements Runnable {
                         System.out.println("---Philosopher " + (id+1) + "'s rigt chopstick IS available.");
                         System.out.println("----Philosopher " + (id+1) + " grabs both chopsticks");
                         System.out.println("----Philosopher " + (id+1) + " has a pair of chopsticks.");
-                        System.out.println("-----Philosopher " + (id+1) +  " is eating." + "\n");
-                        M--;
+
+                        
+                        System.out.println("-----Philosopher " + (id+1) +  " is eating.");
                         Meal.release();
-                        System.out.println("Meals ate: " + (totalM-M));
+                        
                         //eating
                         int eating = 3 + (int) (Math.random() * 4);
                         for (int i = 0; i < eating; i++) {
                             Thread.yield();
                         }
-                        
+
+
+                        M--;
+                        System.out.println("Meals ate: " + (totalM-M));
                         
                         //drops both chopsticks
                         System.out.println("-------Philosopher " + (id+1) + " dropped his left chopstick.");
@@ -148,13 +138,14 @@ public class diningPhilospher implements Runnable {
 
                     }
                     else{
+                        System.out.println("---Philosopher " + (id+1) + "'s right chopstick IS NOT available.");
                         Chopsticks[id].release();
                         Meal.release();
                         Thread.yield();
                     }
                 }   
                 else{
-                    Meal.release();
+                    Meal.release();     
                     Thread.yield();
                 }
             }
